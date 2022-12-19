@@ -130,3 +130,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
 # указываем директорию, в которую будут складываться файлы писем
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
+
+
+LOGIN_URL = "/auth/login/"
+LOGIN_REDIRECT_URL = "index"
+# LOGOUT_REDIRECT_URL = "index"
