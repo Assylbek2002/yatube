@@ -4,18 +4,24 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Post, Group
 from .utils import user_only
 from .forms import PostForm
+from django.core.paginator import Paginator
 
 
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
     posts = Post.objects.filter(group=group)
-    return render(request, "group.html", {"group": group, "posts": posts})
+    paginator = Paginator(posts, 5)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+    return render(request, "group.html", {"group": group, 'page': page, 'paginator': paginator})
 
 
 def index(request):
-    posts = Post.objects.all()
-    context = {"posts": posts}
-    return render(request, "index.html", context)
+    posts = Post.objects.order_by('-pub_date').all()
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+    return render(request, 'index.html', {'page': page, 'paginator': paginator})
 
 
 @login_required
