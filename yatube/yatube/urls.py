@@ -6,7 +6,7 @@ urlpatterns = [
     path("", include("posts.urls")),
     path("auth/", include("users.urls")),
     path("auth/", include("django.contrib.auth.urls")),
-    path('admin/', admin.site.urls),
+    path('superadmin/', admin.site.urls),
     path("about/", include("django.contrib.flatpages.urls"))
 ]
 
