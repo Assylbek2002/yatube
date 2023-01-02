@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
-{% block title %} Новый пост {% endblock %}
+{% block title %} Редактировать запись {% endblock %}
 {% block header %}{% endblock %}
 {% block content %}
     <form method="POST" class="post-form">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="save btn btn-secondary">Add</button>
+        <button type="submit" class="save btn btn-secondary">Edit</button>
     </form>
 {% endblock %}
