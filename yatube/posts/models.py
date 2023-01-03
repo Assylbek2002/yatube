@@ -18,6 +18,14 @@ class Post(models.Model):
     pub_date = models.DateTimeField("date published", auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
     group = models.ForeignKey(Group, blank=True, on_delete=models.CASCADE, null=True, related_name="posts")
+    image = models.ImageField(upload_to='posts/', blank=True, null=True)
 
     def __str__(self):
         return self.text
+
+
+class Comment(models.Model):
+    post = models.ForeignKey(Post, related_name="comments", on_delete=models.CASCADE)
+    author = models.ForeignKey(User, related_name="comments", on_delete=models.CASCADE)
+    text = models.TextField()
+    created = models.DateTimeField("date published", auto_now_add=True)

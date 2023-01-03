@@ -9,8 +9,10 @@ class TestUser(TestCase):
         self.test_user.save()
         self.c = Client()
         self.c.login(username='testuser4', password='testtest14')
-        self.c.post("/new/", data={
-            "text": "Барселона попробует оспорить удаление Жорди Альбы в матче с «Эспаньолом», чтобы тот сыграл с «Атлетико»."})
+        with open("media/posts/CYIY7OgglyQ.jpg", 'rb') as img:
+            self.c.post("/new/", data={
+                "text": "Барселона попробует оспорить удаление Жорди Альбы в матче с «Эспаньолом», чтобы тот сыграл с «Атлетико».",
+                "image": img})
 
     """После регистрации пользователя создается его персональная страница (profile)"""
     def test_profile(self):
@@ -45,15 +47,32 @@ class TestUser(TestCase):
         self.assertEqual(response_unauthorized.status_code, 302)
         self.assertRedirects(response_unauthorized, "/auth/login/?next=/new/")
 
+    def test_post_page_has_image(self):
+        post = Post.objects.filter(text__contains="Жорди")
+        response = self.c.get(f"/{self.test_user.username}/{post[0].id}/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<img')
+
+    def test_main_page_has_image(self):
+        response = self.c.get("")
+        self.assertContains(response, '<img')
+
     def test_edit_post(self):
         post = Post.objects.filter(text__contains="Жорди")
         response = self.c.get(f"/{self.test_user.username}/{post[0].id}/edit/")
-        form = response.context["form"]
-        data = form.initial
+        form = response.context["form"] # get label
+        data = form.initial # get dictionary
         data["text"] = "ОФИЦИАЛЬНО: Луис Суарес — игрок бразильского «Гремио»."
         data["group"] = ""
+        data["image"] = ""
         response = self.c.post(f"/{self.test_user.username}/{post[0].id}/edit/", data=data, follow=True)
         self.assertContains(response, "Луис")
+
+    def test_upload_correct_data(self):
+        with open("media/posts/gradus.txt", 'rb') as file:
+            data = {"text": "Этот год мы никогда не забудем 🤍🏆", "image": file}
+            response = self.c.post("/new/", data=data)
+        self.assertContains(response, "Upload a valid image. The file you uploaded was either not an image or a corrupted image.")
 
     def tearDown(self):
         self.test_user.delete()

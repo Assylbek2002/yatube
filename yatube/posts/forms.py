@@ -1,5 +1,6 @@
 from django.forms import ModelForm
-from .models import Post
+from .models import Post, Comment
+from django import forms
 
 
 class PostForm(ModelForm):
@@ -9,4 +10,12 @@ class PostForm(ModelForm):
 
     class Meta:
         model = Post
-        fields = ("group", "text", )
+        fields = ("group", "text", "image")
+
+
+class CommentForm(ModelForm):
+    text = forms.CharField(widget=forms.Textarea)
+
+    class Meta:
+        model = Comment
+        fields = ("text", )
