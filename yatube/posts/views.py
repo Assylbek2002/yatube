@@ -1,9 +1,10 @@
 from datetime import datetime
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Post, Group, User, Comment
+from .models import Post, Group, User, Follow
 from .forms import PostForm, CommentForm
 from django.core.paginator import Paginator
+from django.views.decorators.cache import cache_page
 
 
 def group_posts(request, slug):
@@ -15,6 +16,7 @@ def group_posts(request, slug):
     return render(request, "group.html", {"group": group, 'page': page, 'paginator': paginator})
 
 
+@cache_page(500, key_prefix="index_page")
 def index(request):
     posts = Post.objects.order_by('-pub_date').all()
     paginator = Paginator(posts, 10)
@@ -53,14 +55,10 @@ def profile(request, username):
 
 @login_required
 def post_view(request, username, post_id):
-    user = get_object_or_404(User, username=username)
-    user_posts = Post.objects.filter(author=user)
-    count_posts = len(user_posts)
     post = get_object_or_404(Post, author__username=username, id=post_id)
     form = CommentForm()
     items = post.comments.all()
-    return render(request, "post.html", {'count': count_posts, 'post': post, 'current_user': user,
-                                         'form': form, 'items': items})
+    return render(request, "post.html", {'post': post, 'form': form, 'items': items})
 
 
 @login_required
@@ -104,3 +102,18 @@ def add_comment(request, username, post_id):
     else:
         form = CommentForm()
     return render(request, "post.html", {'form': form, 'items': items})
+
+
+def follow_index(request):
+    """Посты авторов, на которых подписан текущий пользователь."""
+    authors = get_object_or_404(User, )
+
+
+def profile_follow(request, username):
+    """Подписка на автора"""
+    follow = Follow(author=username, user=request.user)
+
+
+def profile_unfollow(request, username):
+    """Отписка от автора"""
+    pass

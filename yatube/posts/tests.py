@@ -1,5 +1,6 @@
 from django.test import TestCase, Client
 from .models import User, Post
+from django.urls import reverse
 
 
 class TestUser(TestCase):
@@ -73,6 +74,12 @@ class TestUser(TestCase):
             data = {"text": "Этот год мы никогда не забудем 🤍🏆", "image": file}
             response = self.c.post("/new/", data=data)
         self.assertContains(response, "Upload a valid image. The file you uploaded was either not an image or a corrupted image.")
+
+    def test_cache(self):
+        response = self.c.get(reverse('index'))
+        self.c.post("/new/", data={
+            "text": "📰 Standard Sport: «Барселона» имеет все шансы подписать Н'Голо Канте, если тот не продлит контракт с «Челси»."})
+        self.assertNotContains(response, "Канте")
 
     def tearDown(self):
         self.test_user.delete()

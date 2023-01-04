@@ -2,7 +2,6 @@
 {% block title %} Последние обновления {% endblock %}
 {% block header %}{% endblock %}
 {% block content %}
-
 <h1> Последние обновления на сайте</h1>
 {% for post in page %}
     <h3>Автор: {{post.author.get_full_name}}, дата публикации: {{ post.pub_date|date:"d M Y" }}</h3>
@@ -17,5 +16,6 @@
 {% if page.has_other_pages %}
     {% include "paginator.html" with items=page paginator=paginator %}
 {% endif %}
+
 
 {% endblock %}
