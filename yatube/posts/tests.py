@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
-from .models import User, Post
+from .models import User, Post, Follow
 from django.urls import reverse
+from django.shortcuts import get_object_or_404
 
 
 class TestUser(TestCase):
@@ -80,6 +81,14 @@ class TestUser(TestCase):
         self.c.post("/new/", data={
             "text": "📰 Standard Sport: «Барселона» имеет все шансы подписать Н'Голо Канте, если тот не продлит контракт с «Челси»."})
         self.assertNotContains(response, "Канте")
+
+    def test_user_follow(self):
+        test_follow_user = User.objects.create(first_name='FollowUser', last_name='FollowUser', username='follow_user')
+        test_follow_user.set_password('testtest14')
+        test_follow_user.save()
+        Follow.objects.create(author=test_follow_user, user=self.test_user)
+        self.assertEqual(test_follow_user.following.count(), 1)
+
 
     def tearDown(self):
         self.test_user.delete()
