@@ -18,9 +18,7 @@ class TestUser(TestCase):
 
     """После регистрации пользователя создается его персональная страница (profile)"""
     def test_profile(self):
-        c = Client()
-        c.login(username='testuser4', password='testtest14')
-        response = c.get(f"/{self.test_user.username}/")
+        response = self.c.get(f"/{self.test_user.username}/")
         self.assertEqual(response.status_code, 200)
 
     """Авторизованный пользователь может опубликовать пост (new)"""
@@ -84,11 +82,31 @@ class TestUser(TestCase):
 
     def test_user_follow(self):
         test_follow_user = User.objects.create(first_name='FollowUser', last_name='FollowUser', username='follow_user')
-        test_follow_user.set_password('testtest14')
+        test_follow_user.set_password('test_follow')
         test_follow_user.save()
         Follow.objects.create(author=test_follow_user, user=self.test_user)
         self.assertEqual(test_follow_user.following.count(), 1)
+        get_object_or_404(Follow, author=test_follow_user, user=self.test_user).delete()
+        self.assertEqual(test_follow_user.following.count(), 0)
 
+    def test_post_for_follow(self):
+        test_follow_user = User.objects.create(first_name='FollowUser', last_name='FollowUser', username='follow_user')
+        test_follow_user.set_password('test_follow')
+        test_follow_user.save()
+        Follow.objects.create(author=self.test_user, user=test_follow_user)
+        test_follow_client = Client()
+        test_follow_client.login(username='follow_user', password='test_follow')
+        response = test_follow_client.get("/follow/")
+        self.assertContains(response, "Барселона")
+
+    def test_post_for_not_follow(self):
+        test2_user = User.objects.create(first_name='Test2User', last_name='Test2User', username='test2_user')
+        test2_user.set_password('testtest12')
+        test2_user.save()
+        test2_client = Client()
+        test2_client.login(username='test2_user', password='testtest12')
+        response = test2_client.get("/follow/")
+        self.assertNotContains(response, "Барселона")
 
     def tearDown(self):
         self.test_user.delete()
