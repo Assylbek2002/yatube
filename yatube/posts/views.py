@@ -9,7 +9,7 @@ from django.views.decorators.cache import cache_page
 
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
-    posts = Post.objects.filter(group=group)
+    posts = Post.objects.select_related('group').all()
     paginator = Paginator(posts, 5)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -18,7 +18,7 @@ def group_posts(request, slug):
 
 @cache_page(500, key_prefix="index_page")
 def index(request):
-    posts = Post.objects.order_by('-pub_date').all()
+    posts = Post.objects.order_by('-pub_date')[:15]
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)

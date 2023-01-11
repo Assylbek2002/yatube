@@ -27,10 +27,7 @@ SECRET_KEY = 's86+4_mzn&hz0yx+eo2ym&1vn0ze7ayuxru*7=d!ca79$v0enm'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-        "localhost",
-        "127.0.0.1",
-        "[::1]",
-        "testserver",
+       "*"
 ]
 
 
